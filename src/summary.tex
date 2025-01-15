@@ -1,0 +1,380 @@
+\documentclass{beamer}
+
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amsfonts}
+
+% Theorems
+\newtheorem{proposition}{Proposition}
+\newtheorem{remark}{Remark}
+\newtheorem{exercise}{Exercise}
+\newtheorem{hint}{Hint}
+\newtheorem{observation}{Observation}
+\newtheorem{claim}{Claim}
+
+% Fields
+\newcommand{\nn}{\mathbb{N}}
+\newcommand{\rr}{\mathbb{R}}
+
+% Circulation
+\newcommand{\cl}{\text{c}}
+
+\title{Bipartite Perfect Matching is in RNC}
+\author{Alon Gurny}
+\date{\today}
+
+\begin{document}
+
+\frame{\titlepage}
+
+% \begin{abstract}
+%   This is a summary of
+%   \emph{"Bipartite Perfect Matching is in Quasi-NC"}
+%   by Fenner, Gurjar and Thierauf.
+
+%   Perfect matching is a fundamental problem in combinatorial
+%   optimization and Complexity Theory.
+
+%   We will show an algorithm for perfect matching in bipartite graphs
+%   that runs in randomized NC,
+%   with only $O(\log^2 n)$ random bits. This is for both the decision
+%   and the search (TODO) versions.
+
+%   This is almost a complete de-randomization: it gives time
+%   $$O(2^{O(\log^2 n)}) = O(n^{O(\log n)})$$
+% \end{abstract}
+
+\begin{frame}
+  \frametitle{Outline}
+  \tableofcontents
+\end{frame}
+
+% \subsection{Notes}
+% The notations and definitions in this section are largely taken from the paper.
+
+% However, some notations are slightly different here.
+% In particular, we assume a bipartite graph to have $n + n$ vertices instead
+% of $n$ vertices.
+
+% \subsection{Combinatorics and Probability}
+% In this section, we remind ourselves of results in combinatorics and
+% probability that will come up as useful.
+
+\begin{frame}
+  \frametitle{Combinatorics and Probability}
+
+  Throughout this presentation, all graphs are
+  \emph{undirected, balanced, labeled bipartite graphs}.
+
+  The set of edges can be regarded as a relation $E \subseteq [n] \times [n]$.
+\end{frame}
+
+\begin{frame}
+  % Definitions
+  \begin{definitions}
+    \begin{itemize}
+      \item The \emph{bi-adjacency matrix}: $A_G = A_E = A$ of $G$/$E$ is an $n \times n$ matrix where
+            $A_{ij} = 1_{(i, j) \in E}$
+      \item Define $B \le C$ iff $\forall i, j. B_{ij} \le C_{ij}$
+      \item If $E$ are edges, for which $B$ does $B \le A_E$ hold?
+      \item For which $E$ is $A_E$ a permutation matrix?
+    \end{itemize}
+  \end{definitions}
+\end{frame}
+\begin{frame}
+  \begin{definitions}
+    Note that if $B \in \rr^{n \times n}$ and $E$ a set of edges,
+    then $B \le A_E$ if and only if the nonzero entries of
+    $B$ are a subset of the edges in $E$.
+
+    A \emph{perfect matching} is a set of edges $M \subseteq E$ such
+    that every vertex in $V$ is incident to exactly one edge in $M$.
+
+    A \emph{weight function} is a function $w : E \to \nn$.
+
+    We extend it naturally to a function $w : 2^E \to \nn$ by setting
+    $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
+
+    Even more generally, we extend it to a function $w : \rr^{n \times
+        n} \to \rr$ by setting
+    $w(A) = \sum_{i, j} w(A_{ij})$ for all $A \in \rr^{n \times n}$.
+
+    Given $w : E \to \nn$, we define the \emph{weight} of a perfect
+  \end{definitions}
+\end{frame}
+
+\begin{frame}
+
+  % Definition - the perfect matching polytope
+  \begin{definitions}
+    The \emph{perfect matching polytope} $P_G$ is the convex hull of
+    the bi-adjacency matrices of all the perfect matchings of $G$.
+  \end{definitions}
+
+  % Exercise - doubly stochastic matrices are the convex hull of
+  % permutation matrices
+  \begin{definitions}
+    A matrix $M \in \nn^{n \times n}$ is \emph{doubly stochastic} if
+    $M$ is entrywise nonnegative and the sum of the entries in each row
+    and column is $1$.
+
+    Equivalently, $M$ is doubly stochastic if $M \ge 0$ (entrywise) and
+    $M \mathbf{1} = M^T \mathbf{1} = \mathbf{1}$.
+
+    The set of doubly stochastic matrices is denoted by $B_n$ and is
+    called the \emph{Birkhoff polytope}.
+  \end{definitions}
+
+  \begin{exercise}[Birkhoff's theorem (1946)]
+    The set of doubly stochastic matrices is the convex hull of the
+    permutation matrices.
+  \end{exercise}
+
+  \begin{hint}
+    Use Hall's marriage theorem.
+  \end{hint}
+
+  \begin{corollary}
+    The perfect matching polytope $P_G$ is exactly the matrices $B$ in
+    the Birkhoff polytope $B_n$ such that $B \le A_E$.
+  \end{corollary}
+
+  \begin{claim}
+    The symmetric difference of two perfect matchings is a union of
+    disjoint cycles.
+
+    Each cycle consists of interleaved edges from the two matchings.
+  \end{claim}
+
+  \begin{proof}
+    The degree of each vertex is $1$ in a perfect matching.
+
+    Thus, in the symmetric difference of two perfect matchings, each
+    vertex has degree $0$ or $2$.
+
+    Therefore it is a union of disjoint cycles. The rest is easy to see.
+  \end{proof}
+
+  % TODO: add examples
+
+  \subsection{Complexity}
+  TODO.
+
+  \section{Isolation}
+
+  % Define the Edmonds matrix
+
+  The \emph{weighed Edmonds matrix} Let $w : E \to \nn$ be a weight
+  function. $D_{G,w}$ of $G$ is the $n \times n$ matrix where
+  \[
+    D_{G,w}(i, j) =
+    \begin{cases}
+      x_{ij}^{w(ij)} & \text{if } (i, j) \in E, \\
+      0              & \text{otherwise}.
+    \end{cases}
+  \]
+  for all $i, j \in [n]$.
+
+  \begin{definition}
+    A weight function $w : E \to \nn$ is called \emph{isolating} for
+    $G$ if $G$ has a unique minimum weight perfect matching.
+  \end{definition}
+
+  \begin{lemma}
+    If $G$ has a perfect matching and
+    if $w : E \to \nn$ has a unique minimum weight perfect matching $M$
+    with weight $w(M)$,
+    then the term of minimum total degree has weight $w(M)$
+    and contains precisely the variables $x_{ij}$ for $(i, j) \in M$.
+
+    If $G$ has no perfect matching, then $\det D_{G,w} = 0$ for all
+    weight functions $w$.
+  \end{lemma}
+
+  \begin{proof}
+    This is obvious by the definition of the determinant.
+
+    \[
+      \det D_{G,w} = \sum_{\sigma \in S_n} \text{sgn}(\sigma) \prod_{i
+        = 1}^n D_{G,w}(i, \sigma(i))
+    \]
+  \end{proof}
+
+  \begin{lemma}[Isolation lemma](Mulmuley, Vazirani \& Vazirani 1987)
+    Let $B$ be a finite set,
+    and let $k$ be a positive integer.
+    and let $\mathcal{F} \subseteq 2^B$ be a nonempty family of
+    subsets of $B$.
+
+    Let $w : B \to k$ be a be chosen uniformly at random
+    among all functions from $B$ to $[k]$.
+
+    Then, with probability at least $1 - |A|/k$,
+    there exists a \emph{unique} set $S \in \mathcal{F}$
+    with a minimum weight among all sets in $\mathcal{F}$.
+  \end{lemma}
+
+  % TODO: rephrase the corollary statement
+
+  \begin{corollary}
+    There exists a polynomial-time randomized reduction from
+    $\text{PM}$ to $\text{PIT}$ for the determinant of a matrix
+    with entries which are powers of variables.
+
+    There exists a polynomial-time randomized reduction from
+    $\text{Search-PM}$ to calculating the determinant of such a matrix.
+  \end{corollary}
+
+  \begin{proof}
+    Let $m$ be the number of edges in $G$.
+
+    The reduction will choose a random weight function $w : [m] \to [m^2]$.
+    Let $\mathcal{F}$ be the family of perfect matchings of $G$.
+
+    If $G$ has a perfect matching, then $\mathcal{F}$ is nonempty:
+    by the isolation lemma, with probability at least $(1 - m/m^2) = 1 - 1/m =
+      \Theta(1 - 1/m)$, $w$ is isolating for $G$.
+
+    In the decision version, this amounts to checking whether the
+    determinant of $D_{G,w}$ is nonzero.
+    In the search version, this amounts to finding the minimum total
+    degree term of the determinant of $D_{G,w}$.
+  \end{proof}
+
+  \section{Main Content}
+
+  \begin{definition}
+    Let $w : E \to \nn$ be a weight function.
+    The \emph{circulation} of a cycle $C = {e_1, \ldots, e_{2k}}$ is defined as
+    \[
+      \cl_w(C) = |w(e_1) - w(e_2) + \ldots + w(e_{2k - 1}) - w(e_{2k})|
+    \]
+
+    This is well defined because we take the absolute value.
+  \end{definition}
+
+  \begin{remark}
+    Let $M_1$ and $M_2$ be two perfect matchings of $G$,
+    and suppose $C\subseteq M_1 \triangle M_2$.
+
+    Then $\cl_w(C) = |w(C \cap M_1) - w(C \cap M_2)|$.
+  \end{remark}
+
+  \begin{lemma}
+    Suppose $G$ has a perfect matching.
+    Let $w : E \to \nn$ be a weight function.
+
+    If every cycle in $G$ has a nonzero circulation, then $w$ is
+    isolating for $G$.
+  \end{lemma}
+
+  \begin{proof}
+    On the contrary, suppose that $M_1$ and $M_2$ are two minimum
+    perfect matchings of $G$.
+    Choose some cycle $C \subseteq M_1 \triangle M_2$.
+
+    Since $\cl_w(C) > 0$, we have $w(C \cap M_1) \ne w(C \cap M_2)$.
+    WLOG, assume that $w(C \cap M_1) < w(C \cap M_2)$.
+    Then $M_2 \triangle C$ is a perfect matching with weight less than
+    $w(M_2) = w(M_1)$,
+    contradicting minimality.
+  \end{proof}
+
+  \begin{lemma}
+    Let $r \ge 2$ be even.
+    Suppose $G$ has no cycles of size at most $2r$.
+
+    Then $G$ has at most $n^4$ cycles of size at most $4r$.
+  \end{lemma}
+
+  \begin{proof}
+    The assumption is equivalent to saying that there exists at most
+    one path of length $r$ between any two vertices.
+
+    Let $v_0, v_1, v_2, v_3$ be vertices in $V_1$, such that the
+    distance between $i$ and $v_{i + 1 \mod 4}$ is at most $r$.
+
+    Since there exists at most one path of length $r$ between $i$ and
+    $v_{i + 1 \mod 4}$,
+    there exists a partial function from $V_1^4$ to cycles in $G$ that maps
+    $(v_0, v_1, v_2, v_3)$ to the cycle composed of the unique paths of
+    length $r$ between $i$ and $v_{i + 1 \mod 4}$.
+
+    Let $C$ be a cycle of size at most $4r$.
+
+    We can choose arbitrarily $v_0, v_1, v_2, v_3 \in C$ such that
+    the distance between $i$ and $v_{i + 1 \mod 4}$ is at most $r$.
+
+    Therefore, this function is onto the set of cycles of size at most $4r$.
+    Thus, there exist at most $|V_1|^4 = n^4$ cycles of size at most $4r$.
+  \end{proof}
+
+  \begin{lemma}
+    Suppose each edge in $H$ is contained in some perfect matching. Let
+    $w : E \to \nn$ be a weight function,
+    such that the weight of every perfect matching is the same.
+
+    Then the circulation of every cycle in $H$ is zero.
+  \end{lemma}
+
+  \begin{proof}
+    Let $X$ be the average of all perfect matchings.
+    Specifically, let $t$ be the number of perfect matchings, and let
+    $A_1, \ldots, A_t$ be the perfect matchings.
+    Then $X = \frac{1}{t} \sum_{i = 1}^t M_i$.
+
+    Since each edge is contained in some perfect matching, we have
+    $X_{ij} \ge \frac{1}{t}$ for all $i, j$ such that
+    $(i, j) \in E$.
+
+    Let $\varepsilon = \frac{1}{t}$.
+
+    Let $C = {e_1, \ldots, e_{2p}}$ be a cycle in $H$.
+
+    Define $Y$ by
+    \[
+      Y_{ij} =
+      \begin{cases}
+        X_{ij} + (-1)^{k} \varepsilon & \text{if } (i, j) = e_k \in C, \\
+        X_{ij}                        & \text{otherwise}.
+      \end{cases}
+    \]
+
+    Then clearly $Y \ge 0$ and $Y \mathbf{1} = Y^T \mathbf{1} = \mathbf{1}$.
+    Therefore, $Y$ lies in the perfect matching polytope.
+
+    Since all the perfect matchings have the same weight, $w(T) = w(X)$
+    and thus $w(Y - X) = 0$.
+    But $\cl_w(C) = \varepsilon w(Y - x)$, and thus $\cl_w(C) = 0$.
+  \end{proof}
+
+  \begin{lemma}
+    Let $s = \text{poly}(n)$. Using $O(\log n)$ random bits we can
+    generate a weight assignment
+    $w : E \to \nn$ with $|w| = \text{poly}(n)$ such that for every set
+    of $s$ cycles,
+    $w$ gives nonzero circulation to all of them with probability at
+    least $1 - 1/n$.
+  \end{lemma}
+
+  \begin{proof}
+    Let the cycles be $C_1, \ldots, C_s$. Then, $\cl_w(C_i) \ne 0$ for
+    all $i$ is equivalent to
+    $\prod_{i = 1}^s \cl_w(C_i) \ne 0$. This product is bounded by
+    $\text{poly}(n)^s = 2^{\text{poly}(n)}$.
+
+    Thus, it has at most $\text{poly}(n)$ prime factors, say $k$ prime
+    factors. Choose $t = kn$.
+
+    Then if we choose a random prime amongst the first $t$ primes
+    $[p_1, \ldots, p_t]$, then if the product is nonzero,
+    with probability at least $1 - 1/n$ it is still true modulo the chosen prime.
+    Since... TODO.
+  \end{proof}
+\end{frame}
+
+\end{document}
