@@ -8,20 +8,65 @@
 \usepackage{amssymb}
 \usepackage{amsfonts}
 
+\usetheme{Frankfurt}
+
+\addtobeamertemplate{navigation symbols}{}{
+    \usebeamerfont{footline}
+    \usebeamercolor[fg]{footline}
+    \hspace{1em}
+    \insertframenumber/\inserttotalframenumber
+}
+
 % Theorems
 \newtheorem{proposition}{Proposition}
-\newtheorem{remark}{Remark}
 \newtheorem{exercise}{Exercise}
-\newtheorem{hint}{Hint}
 \newtheorem{observation}{Observation}
 \newtheorem{claim}{Claim}
+
+% Open Problem
+\theoremstyle{remark}
+\newtheorem{remark}{Remark}
+\newtheorem{open}{Open Problem}
+\newtheorem{resolved}{Today}
+\newtheorem{hint}{Hint}
 
 % Fields
 \newcommand{\nn}{\mathbb{N}}
 \newcommand{\rr}{\mathbb{R}}
+\newcommand{\ii}{\rr_{\ge 0}}
 
 % Circulation
 \newcommand{\cl}{\text{c}}
+
+% Birkhoff polytope
+\newcommand{\birk}{\mathcal{B}}
+
+% Bi-adjacency matrix
+\newcommand{\biadj}[1]{\mathbf{A}_{#1}}
+
+% Perfect matching polytope
+\newcommand{\pmatch}{\mathcal{P}}
+
+% Convex hull
+\newcommand{\ch}[1]{\mathbf{CH}(#1)}
+
+% Set comprehension
+\newcommand{\setcomp}[1]{\left\{#1\right\}}
+
+% Sign
+\newcommand{\sgn}{\mathsf{sgn}}
+
+% Decision version of perfect matching
+\newcommand{\dpm}{\mathsf{DPM}}
+
+% Search version of perfect matching
+\newcommand{\spm}{\mathsf{SearchPM}}
+
+% Complexity classes
+\newcommand{\nc}{{\mathcal{NC}}}
+
+% Asymptotic notation
+\newcommand{\OO}{\mathcal{O}}
 
 \title{Bipartite Perfect Matching is in RNC}
 \author{Alon Gurny}
@@ -31,118 +76,304 @@
 
 \frame{\titlepage}
 
-% \begin{abstract}
-%   This is a summary of
-%   \emph{"Bipartite Perfect Matching is in Quasi-NC"}
-%   by Fenner, Gurjar and Thierauf.
-
-%   Perfect matching is a fundamental problem in combinatorial
-%   optimization and Complexity Theory.
-
-%   We will show an algorithm for perfect matching in bipartite graphs
-%   that runs in randomized NC,
-%   with only $O(\log^2 n)$ random bits. This is for both the decision
-%   and the search (TODO) versions.
-
-%   This is almost a complete de-randomization: it gives time
-%   $$O(2^{O(\log^2 n)}) = O(n^{O(\log n)})$$
-% \end{abstract}
-
 \begin{frame}
   \frametitle{Outline}
   \tableofcontents
 \end{frame}
 
-% \subsection{Notes}
-% The notations and definitions in this section are largely taken from the paper.
+\section{Introduction}
 
-% However, some notations are slightly different here.
-% In particular, we assume a bipartite graph to have $n + n$ vertices instead
-% of $n$ vertices.
+% Frame: NC
+\begin{frame}
+  \frametitle{NC}
 
-% \subsection{Combinatorics and Probability}
-% In this section, we remind ourselves of results in combinatorics and
-% probability that will come up as useful.
+  \begin{definition}
+    \begin{itemize}
+      \item We define $\nc^k$ to be the class of problems that can be solved
+            by a polynomial-time uniform family of circuits of polynomial
+            size and depth $\OO(\log^k n)$.
+      \item Equivalently, $\nc^k$ is the class of problems that can be solved
+            by a polynomial number of processors in $\OO(\log^k n)$ time.
+      \item \[
+              \nc = \bigcup_{k \ge 0} \nc^k
+            \]
+    \end{itemize}
+  \end{definition}
+\end{frame}
+
+% Frame: Perfect Matching
+\begin{frame}
+  \frametitle{Perfect Matching}
+
+  \begin{definition}
+    \begin{itemize}
+      \item A \emph{perfect matching} of a graph $G$ is a set of edges
+            such that every vertex is incident to exactly one edge.
+      \item The \emph{perfect matching problem} is to determine whether
+            a graph has a perfect matching, or to find one.
+      \item The \emph{decision version} of the perfect matching problem
+            is denoted $\dpm$.
+      \item The \emph{search version} of the perfect matching problem
+            is denoted $\spm$.
+    \end{itemize}
+  \end{definition}
+\end{frame}
+
+% Frame: State of the Art
+\begin{frame}
+  \frametitle{State of the Art}
+
+  It has already been known that perfect matching (whether decision or search)
+  can be solved in randomized $\nc$.
+
+  \begin{open}
+    Can perfect matching be solved in $\nc$?
+  \end{open}
+
+  \begin{resolved}
+    Perfect matching (decision/search) can be solved in:
+    \begin{itemize}
+      \item $\mathsf{Quasi-}\nc^2$
+            (that is, with $\OO(n^{\log n})$ processors and
+            $\OO(\log^2 n)$ depth)
+      \item randomized $\nc^2$ for decision
+            with only $\OO(\log^2 n)$ random bits.
+      \item (We will not see this) $\nc^3$ for search
+            with only $\OO(\log^2 n)$ random bits.
+    \end{itemize}
+  \end{resolved}
+\end{frame}
+
+\section{Combinatorics and Probability}
 
 \begin{frame}
   \frametitle{Combinatorics and Probability}
 
-  Throughout this presentation, all graphs are
-  \emph{undirected, balanced, labeled bipartite graphs}.
+  \begin{remark}
+    Throughout this presentation, \emph{ALL} the graphs are:
+    \begin{itemize}
+      \item undirected
+      \item bipartite
+      \item balanced
+      \item labeled
+    \end{itemize}
 
-  The set of edges can be regarded as a relation $E \subseteq [n] \times [n]$.
+    Usually we call our graph $G$ and the set of edges $E$.
+
+    The set of edges can be regarded as a relation $E \subseteq [n] \times [n]$.
+  \end{remark}
 \end{frame}
 
 \begin{frame}
   % Definitions
-  \begin{definitions}
+  \begin{definitions}[Bi-adjacency Matrix]
     \begin{itemize}
-      \item The \emph{bi-adjacency matrix}: $A_G = A_E = A$ of $G$/$E$ is an $n \times n$ matrix where
+      \item The \emph{bi-adjacency matrix}: $\biadj{G} = \biadj{E} = A$ of $G$ (or $E$) is an $n \times n$ matrix where
             $A_{ij} = 1_{(i, j) \in E}$
-      \item Define $B \le C$ iff $\forall i, j. B_{ij} \le C_{ij}$
-      \item If $E$ are edges, for which $B$ does $B \le A_E$ hold?
-      \item For which $E$ is $A_E$ a permutation matrix?
+      \item We write $B \le C$ iff $\forall i, j. B_{ij} \le C_{ij}$
+
+    \end{itemize}
+  \end{definitions}
+
+  \begin{exercise}
+    For which $E \subseteq [n] \times [n]$ is $\biadj{E}$ a permutation matrix?
+  \end{exercise}
+
+  \begin{exercise}
+    For which $B \in \mathbb{R}^{n \times n}$ and $E$ satisfy $B \le \biadj{E}$?
+  \end{exercise}
+\end{frame}
+
+\begin{frame}
+  \begin{definitions}[Weight Functions]
+    \begin{itemize}
+      \item A \emph{weight function} is a function $w : E \to \nn$.
+
+      \item We extend it naturally to a function $w : 2^E \to \nn$ by setting
+            $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
+
+      \item Even more generally (why?), we extend it to a function $w : \ii^{n \times
+                n} \to \rr$ by setting
+            $w(A) = \sum_{i, j} w(A_{ij})$ for all $A \in \ii^{n \times n}$.
     \end{itemize}
   \end{definitions}
 \end{frame}
+
 \begin{frame}
-  \begin{definitions}
-    Note that if $B \in \rr^{n \times n}$ and $E$ a set of edges,
-    then $B \le A_E$ if and only if the nonzero entries of
-    $B$ are a subset of the edges in $E$.
-
-    A \emph{perfect matching} is a set of edges $M \subseteq E$ such
-    that every vertex in $V$ is incident to exactly one edge in $M$.
-
-    A \emph{weight function} is a function $w : E \to \nn$.
-
-    We extend it naturally to a function $w : 2^E \to \nn$ by setting
-    $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
-
-    Even more generally, we extend it to a function $w : \rr^{n \times
-        n} \to \rr$ by setting
-    $w(A) = \sum_{i, j} w(A_{ij})$ for all $A \in \rr^{n \times n}$.
-
-    Given $w : E \to \nn$, we define the \emph{weight} of a perfect
-  \end{definitions}
+  \begin{definitions}[Perfect Matching]
+    \begin{itemize}
+      \item A \emph{permutation matrix} is a matrix $\biadj{\Gamma}$
+            where $\Gamma = \setcomp{(i, \sigma i) : i \in [n]}$ for some permutation
+            $\sigma \in S_n$
+      \item A \emph{perfect matching} is a set of edges $M$ such
+            that every vertex is incident to exactly one edge in $M$.
+      \item Equivalently, $M$ is a perfect matching iff $\biadj{M}$ is a permutation
+            matrix.
+    \end{itemize}\end{definitions}
 \end{frame}
 
-\begin{frame}
-
-  % Definition - the perfect matching polytope
-  \begin{definitions}
-    The \emph{perfect matching polytope} $P_G$ is the convex hull of
-    the bi-adjacency matrices of all the perfect matchings of $G$.
-  \end{definitions}
-
+% Birkhoff's theorem
+\begin{frame}[allowframebreaks]
+  \frametitle{Birkhoff's Theorem}
   % Exercise - doubly stochastic matrices are the convex hull of
   % permutation matrices
-  \begin{definitions}
-    A matrix $M \in \nn^{n \times n}$ is \emph{doubly stochastic} if
-    $M$ is entrywise nonnegative and the sum of the entries in each row
-    and column is $1$.
+  \begin{definition}[Doubly Stochastic Matrix]
+    \begin{itemize}
+      \item A matrix $M \in \ii^{n \times n}$ is \emph{doubly stochastic} if
+            the sum of the entries in each row
+            and column is $1$.
 
-    Equivalently, $M$ is doubly stochastic if $M \ge 0$ (entrywise) and
-    $M \mathbf{1} = M^T \mathbf{1} = \mathbf{1}$.
+      \item Equivalently, $M$ is doubly stochastic if
+            $M \mathbf{1} = M^T \mathbf{1} = \mathbf{1}$.
+    \end{itemize}
+  \end{definition}
 
-    The set of doubly stochastic matrices is denoted by $B_n$ and is
-    called the \emph{Birkhoff polytope}.
-  \end{definitions}
+  % Definition of the convex hull
+  \begin{definition}[Convex Hull]
+    The \emph{convex hull} of a set $S$ is the smallest convex set
+    containing $S$, denoted $\ch{S}$.
 
-  \begin{exercise}[Birkhoff's theorem (1946)]
-    The set of doubly stochastic matrices is the convex hull of the
+    It is precisely the set of all convex combinations of elements of $S$,
+    i.e., $\ch{S} = \setcomp{\sum_{i = 1}^k \lambda_i x_i : x_i \in S, \lambda_i \ge 0, \sum_{i = 1}^k \lambda_i = 1}$.
+  \end{definition}
+
+  \begin{theorem}[Birkhoff, 1946]
+    The set of doubly stochastic matrices, denoted $\birk_n$, is the convex hull of the
     permutation matrices.
-  \end{exercise}
+  \end{theorem}
 
   \begin{hint}
     Use Hall's marriage theorem.
   \end{hint}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Perfect Matching Polytope}
+
+  \begin{theorem}[Birkhoff, 1946]
+    The set of doubly stochastic matrices is the convex hull of the
+    permutation matrices.
+  \end{theorem}
+
+  % Definition - the perfect matching polytope
+  \begin{definition}[Perfect Matching Polytope]
+    The \emph{perfect matching polytope} $\pmatch_G$ is the convex hull of
+    the bi-adjacency matrices of all the perfect matchings of $G$.
+  \end{definition}
 
   \begin{corollary}
     The perfect matching polytope $P_G$ is exactly the matrices $B$ in
-    the Birkhoff polytope $B_n$ such that $B \le A_E$.
+    the Birkhoff polytope $B_n$ such that $B \le \biadj{G}$:
+    \[
+      \pmatch_G = \setcomp{B : B \in \birk_n \wedge B \le \biadj{G}}
+    \]
+  \end{corollary}
+\end{frame}
+
+\section{Complexity}
+\begin{frame}
+  \begin{definition}
+    Let $M$ be a perfect matching.
+    We define its \emph{sign} $\sgn M = \sgn \sigma$ where $\sigma$
+    is the permutation given by $M$.
+  \end{definition}
+  \begin{definition}
+    Let $w : E \to \nn$ be a weight function.
+
+    Let $a$ be a number or a variable.
+
+    We define a matrix $D_a^{E,w}$ as follows:
+
+    \[
+      {\left(D_a^{E,w}\right)}_{ij} =
+      \begin{cases}
+        a^{w(ij)} & \text{if } (i, j) \in E, \\
+        0         & \text{otherwise}.
+      \end{cases}
+    \]
+  \end{definition}
+
+  \begin{claim}
+    Let $a$ be a number or a variable. Then:
+    \[
+      \det D_a^{E,w} = \sum_{M \text{ perfect matching}} \sgn M \cdot a^{w(M)}
+    \]
+  \end{claim}
+\end{frame}
+
+\begin{frame}
+  \begin{definition}
+    A weight function $w : E \to \nn$ is called \emph{isolating} for
+    $E$ if the existence of a perfect matching in $E$
+    implies that $E$ has a unique minimum weight perfect matching,
+    which is then called \emph{isolated}.
+  \end{definition}
+
+  \begin{example}
+    Let $E = \left\{e_k\right\}_k$ be an enumeration of the edges.
+    Let $w : E \to \nn$ be defined by
+    $w(e_k) = 2^k$. \emph{Every} subset of $E$ has a unique
+    weight.
+    
+    In particular, $w$ is isolating for $E$.
+  \end{example}
+
+  \begin{corollary}
+    Let $x$ be a variable.
+    \begin{itemize}
+      \item If $E$ has no perfect matchings, then
+            $\det D_x^{E,w} = 0$.
+      \item If $w$ is isolating for $E$,
+            then $\det D_x^{E,w} \ne 0 \iff $ there is a perfect matching.
+    \end{itemize}
+  \end{corollary}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Isolation Lemma}
+  \begin{lemma}[Mulmuley, Vazirani \& Vazirani 1987]
+    Let $B$ be a finite set.
+
+    Let $k$ be a positive integer.
+
+    Let $\mathcal{F} \subseteq 2^B$ be a nonempty family of
+    subsets of $B$.
+
+    Let $w : B \to k$ be a be chosen uniformly at random
+    among all functions from $B$ to $[k]$.
+
+    Then, with probability at least $1 - |B|/k$,
+    there exists a \emph{unique} set $S \in \mathcal{F}$
+    with a minimum weight among all sets in $\mathcal{F}$.
+  \end{lemma}
+\end{frame}
+\begin{frame}
+  % Corollary for perfect matching
+  \begin{corollary}
+    Let $w : E \to [n^3]$ be a random weight function.
+
+    Then with probability at least $1 - 1/n$, $w$ is isolating for $G$.
   \end{corollary}
 
+  \begin{proof}
+    Take $\mathcal{F}$ as the family of perfect matchings of $G$.
+
+
+    As, $|E| \le n^2$, by the isolation lemma, with probability at least
+    \[
+      (1 - |E|/n^3) \ge 1 - n^2/n^3 = 1 - 1/n
+    \]
+    $w$ is isolating for $G$.
+  \end{proof}
+
+  \begin{corollary}
+    There exists an $\mathsf{RNC}$ algorithm that can solve $\dpm$,
+    which uses $poly(n)$ random bits.
+  \end{corollary}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Cycles}
   \begin{claim}
     The symmetric difference of two perfect matchings is a union of
     disjoint cycles.
@@ -158,95 +389,8 @@
 
     Therefore it is a union of disjoint cycles. The rest is easy to see.
   \end{proof}
-
-  % TODO: add examples
-
-  \subsection{Complexity}
-  TODO.
-
-  \section{Isolation}
-
-  % Define the Edmonds matrix
-
-  The \emph{weighed Edmonds matrix} Let $w : E \to \nn$ be a weight
-  function. $D_{G,w}$ of $G$ is the $n \times n$ matrix where
-  \[
-    D_{G,w}(i, j) =
-    \begin{cases}
-      x_{ij}^{w(ij)} & \text{if } (i, j) \in E, \\
-      0              & \text{otherwise}.
-    \end{cases}
-  \]
-  for all $i, j \in [n]$.
-
-  \begin{definition}
-    A weight function $w : E \to \nn$ is called \emph{isolating} for
-    $G$ if $G$ has a unique minimum weight perfect matching.
-  \end{definition}
-
-  \begin{lemma}
-    If $G$ has a perfect matching and
-    if $w : E \to \nn$ has a unique minimum weight perfect matching $M$
-    with weight $w(M)$,
-    then the term of minimum total degree has weight $w(M)$
-    and contains precisely the variables $x_{ij}$ for $(i, j) \in M$.
-
-    If $G$ has no perfect matching, then $\det D_{G,w} = 0$ for all
-    weight functions $w$.
-  \end{lemma}
-
-  \begin{proof}
-    This is obvious by the definition of the determinant.
-
-    \[
-      \det D_{G,w} = \sum_{\sigma \in S_n} \text{sgn}(\sigma) \prod_{i
-        = 1}^n D_{G,w}(i, \sigma(i))
-    \]
-  \end{proof}
-
-  \begin{lemma}[Isolation lemma](Mulmuley, Vazirani \& Vazirani 1987)
-    Let $B$ be a finite set,
-    and let $k$ be a positive integer.
-    and let $\mathcal{F} \subseteq 2^B$ be a nonempty family of
-    subsets of $B$.
-
-    Let $w : B \to k$ be a be chosen uniformly at random
-    among all functions from $B$ to $[k]$.
-
-    Then, with probability at least $1 - |A|/k$,
-    there exists a \emph{unique} set $S \in \mathcal{F}$
-    with a minimum weight among all sets in $\mathcal{F}$.
-  \end{lemma}
-
-  % TODO: rephrase the corollary statement
-
-  \begin{corollary}
-    There exists a polynomial-time randomized reduction from
-    $\text{PM}$ to $\text{PIT}$ for the determinant of a matrix
-    with entries which are powers of variables.
-
-    There exists a polynomial-time randomized reduction from
-    $\text{Search-PM}$ to calculating the determinant of such a matrix.
-  \end{corollary}
-
-  \begin{proof}
-    Let $m$ be the number of edges in $G$.
-
-    The reduction will choose a random weight function $w : [m] \to [m^2]$.
-    Let $\mathcal{F}$ be the family of perfect matchings of $G$.
-
-    If $G$ has a perfect matching, then $\mathcal{F}$ is nonempty:
-    by the isolation lemma, with probability at least $(1 - m/m^2) = 1 - 1/m =
-      \Theta(1 - 1/m)$, $w$ is isolating for $G$.
-
-    In the decision version, this amounts to checking whether the
-    determinant of $D_{G,w}$ is nonzero.
-    In the search version, this amounts to finding the minimum total
-    degree term of the determinant of $D_{G,w}$.
-  \end{proof}
-
-  \section{Main Content}
-
+\end{frame}
+\begin{frame}
   \begin{definition}
     Let $w : E \to \nn$ be a weight function.
     The \emph{circulation} of a cycle $C = {e_1, \ldots, e_{2k}}$ is defined as
@@ -263,9 +407,9 @@
 
     Then $\cl_w(C) = |w(C \cap M_1) - w(C \cap M_2)|$.
   \end{remark}
-
+\end{frame}
+\begin{frame}
   \begin{lemma}
-    Suppose $G$ has a perfect matching.
     Let $w : E \to \nn$ be a weight function.
 
     If every cycle in $G$ has a nonzero circulation, then $w$ is
@@ -283,7 +427,8 @@
     $w(M_2) = w(M_1)$,
     contradicting minimality.
   \end{proof}
-
+\end{frame}
+\begin{frame}[allowframebreaks]
   \begin{lemma}
     Let $r \ge 2$ be even.
     Suppose $G$ has no cycles of size at most $2r$.
@@ -292,46 +437,68 @@
   \end{lemma}
 
   \begin{proof}
-    The assumption is equivalent to saying that there exists at most
-    one path of length $r$ between any two vertices.
+    \begin{itemize}
+      \item Equivalently, there is at most
+            one path of length $\le r$ between any two vertices.
 
-    Let $v_0, v_1, v_2, v_3$ be vertices in $V_1$, such that the
-    distance between $i$ and $v_{i + 1 \mod 4}$ is at most $r$.
+      \item Let $v_0, v_1, v_2, v_3$ be vertices in $V_1$, such that the
+            distance between $v_i$ and $v_{i + 1 \mod 4}$ is $\le r$.
 
-    Since there exists at most one path of length $r$ between $i$ and
-    $v_{i + 1 \mod 4}$,
-    there exists a partial function from $V_1^4$ to cycles in $G$ that maps
-    $(v_0, v_1, v_2, v_3)$ to the cycle composed of the unique paths of
-    length $r$ between $i$ and $v_{i + 1 \mod 4}$.
+      \item There exists a \emph{partial function} from $V_1^4$ to cycles in $G$ that maps
+            $(v_0, v_1, v_2, v_3)$ to the cycle composed of the unique paths of
+            length $\le r$ between $v_i$ and $v_{i + 1 \mod 4}$.
 
-    Let $C$ be a cycle of size at most $4r$.
+      \item Let $C$ be a cycle of size $\le 4r$.
 
-    We can choose arbitrarily $v_0, v_1, v_2, v_3 \in C$ such that
-    the distance between $i$ and $v_{i + 1 \mod 4}$ is at most $r$.
+            We can choose arbitrarily $v_0, v_1, v_2, v_3 \in C$ such that
+            the distance between $v_i$ and $v_{i + 1 \mod 4}$ is $\le r$.
 
-    Therefore, this function is onto the set of cycles of size at most $4r$.
-    Thus, there exist at most $|V_1|^4 = n^4$ cycles of size at most $4r$.
+      \item This function is onto the set of cycles of size $\le 4r$.
+            Thus, there are at most $|V_1|^4 = n^4$ cycles of size $\le 4r$.
+
+    \end{itemize}
   \end{proof}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \begin{definition}
+    Suppose $G$ has a perfect matching. Let $w : E \to \nn$ be a weight function.
+
+    Then $G_w \subseteq G$ is the union of all minimum weight
+    perfect matchings of $G$, relatively to $w$.
+  \end{definition}
 
   \begin{lemma}
-    Suppose each edge in $H$ is contained in some perfect matching. Let
-    $w : E \to \nn$ be a weight function,
-    such that the weight of every perfect matching is the same.
+    Suppose $G$ has a perfect matching and let
+    $w : E \to \nn$ be a weight function.
 
-    Then the circulation of every cycle in $H$ is zero.
+    Then every perfect matching in $G_w$ has the same weight
+    as every minimum weight matching in $G$.
   \end{lemma}
 
   \begin{proof}
-    Let $X$ be the average of all perfect matchings.
-    Specifically, let $t$ be the number of perfect matchings, and let
-    $A_1, \ldots, A_t$ be the perfect matchings.
-    Then $X = \frac{1}{t} \sum_{i = 1}^t M_i$.
+    TODO: complete me.
+  \end{proof}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \begin{lemma}
+    Suppose $G$ has a perfect matching and let
+    $w : E \to \nn$ be a weight function.
+
+    Then the $w$-circulation of every cycle in $G_w$ is zero.
+  \end{lemma}
+
+  \begin{proof}
+    Let $X$ be the average of all perfect matchings in $G_w$.
+    
+    Let $t$ be the number of perfect matchings, $\varepsilon = 1/t$, and let
+    $M_1, \ldots, M_t$ be the perfect matchings.
+    Then $X = \varepsilon \sum_{i = 1}^t M_i$.
 
     Since each edge is contained in some perfect matching, we have
-    $X_{ij} \ge \frac{1}{t}$ for all $i, j$ such that
+    $X_{ij} \ge \varepsilon$ for all $i, j$ such that
     $(i, j) \in E$.
-
-    Let $\varepsilon = \frac{1}{t}$.
 
     Let $C = {e_1, \ldots, e_{2p}}$ be a cycle in $H$.
 
@@ -347,13 +514,14 @@
     Then clearly $Y \ge 0$ and $Y \mathbf{1} = Y^T \mathbf{1} = \mathbf{1}$.
     Therefore, $Y$ lies in the perfect matching polytope.
 
-    Since all the perfect matchings have the same weight, $w(T) = w(X)$
+    Since all the perfect matchings have the same weight, $w(Y) = w(X)$
     and thus $w(Y - X) = 0$.
-    But $\cl_w(C) = \varepsilon w(Y - x)$, and thus $\cl_w(C) = 0$.
+    But $\cl_w(C) = \varepsilon w(Y - X)$, and thus $\cl_w(C) = 0$.
   \end{proof}
-
+\end{frame}
+\begin{frame}
   \begin{lemma}
-    Let $s = \text{poly}(n)$. Using $O(\log n)$ random bits we can
+    Let $s = \text{poly}(n)$. Using $\OO(\log n)$ random bits we can
     generate a weight assignment
     $w : E \to \nn$ with $|w| = \text{poly}(n)$ such that for every set
     of $s$ cycles,
@@ -373,7 +541,48 @@
     Then if we choose a random prime amongst the first $t$ primes
     $[p_1, \ldots, p_t]$, then if the product is nonzero,
     with probability at least $1 - 1/n$ it is still true modulo the chosen prime.
-    Since... TODO.
+
+    Choose $w(e_k) = 2^k$ and we are done.
+  \end{proof}
+\end{frame}
+
+% The algorithm
+\begin{frame}[allowframebreaks]
+  \begin{theorem}
+    Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
+
+    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
+    such that for every set of $w_i$ gives nonzero circulation to all the 
+    cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
+
+    Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
+  \end{theorem}
+
+  \begin{proof}
+    Since $w_i$ gives nonzero circulation to all the cycles
+    in $G^i$, all those cycles do not appear in $G^{i+1}$.
+
+    In particular, $G^k$ has no cycles of size at most $4 \cdot 2^k \ge n$.
+
+    That is, $G^k$ has a unique perfect matching.
+    We want to show that it is isolated by $w$.
+    This follows from the next lemma.
+  \end{proof}
+
+  \begin{lemma}
+    Suppose $M_1$ is a matching that appears in $G^i$ but not in $G^{i+1}$ and $M_2$ is a matching
+    that appears in $G_{i+1}$.
+
+    Then $w_{i+1}(M_1) > w_{i+1}(M_2)$.
+  \end{lemma}
+
+  \begin{proof}
+    Since $M_2$ appears in $G_{i+1}$, it has 
+    the same weight as the $w_i$-minimum weight matching in $G_i$.
+    That is $w_{i+1}(M_2) \le w_i(M_2)$.
+
+    But if $w_{i+1}(M_1) = w_{i+1}(M_2)$, then $M_1$ would have been in $G^{i+1}$.
+    by its definition.
   \end{proof}
 \end{frame}
 
