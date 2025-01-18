@@ -29,6 +29,7 @@
 \newtheorem{open}{Open Problem}
 \newtheorem{resolved}{Today}
 \newtheorem{hint}{Hint}
+\newtheorem{notation}{Notation}
 
 % Fields
 \newcommand{\nn}{\mathbb{N}}
@@ -57,7 +58,7 @@
 \newcommand{\sgn}{\mathsf{sgn}}
 
 % Decision version of perfect matching
-\newcommand{\dpm}{\mathsf{DPM}}
+\newcommand{\dpm}{\mathsf{PM}}
 
 % Search version of perfect matching
 \newcommand{\spm}{\mathsf{SearchPM}}
@@ -68,7 +69,7 @@
 % Asymptotic notation
 \newcommand{\OO}{\mathcal{O}}
 
-\title{Bipartite Perfect Matching is in RNC}
+\title{Bipartite Perfect Matching is in Quasi-NC}
 \author{Alon Gurny}
 \date{\today}
 
@@ -82,6 +83,25 @@
 \end{frame}
 
 \section{Introduction}
+
+% Notation
+\begin{frame}
+  \frametitle{Notation}
+
+  \begin{notation}
+    Throughout this presentation, \emph{ALL} the graphs are:
+    \begin{itemize}
+      \item undirected
+      \item bipartite
+      \item balanced
+      \item labeled
+    \end{itemize}
+
+    Usually we call our graph $G$ and the set of edges $E$.
+
+    The set of edges can be regarded as a relation $E \subseteq [n] \times [n]$.
+  \end{notation}
+\end{frame}
 
 % Frame: NC
 \begin{frame}
@@ -99,6 +119,13 @@
             \]
     \end{itemize}
   \end{definition}
+
+  \begin{fact}
+    $\mathsf{DET}$,
+    the problem of computing the determinant of an $n \times n$ matrix
+    with $poly(n)$ entries,
+    is in $\nc^2$.
+  \end{fact}
 \end{frame}
 
 % Frame: Perfect Matching
@@ -131,38 +158,23 @@
   \end{open}
 
   \begin{resolved}
-    Perfect matching (decision/search) can be solved in:
+    There exist algorithms in:
     \begin{itemize}
-      \item $\mathsf{Quasi-}\nc^2$
+      \item $\mathsf{Quasi-}\nc^2$ for $\dpm$
             (that is, with $\OO(n^{\log n})$ processors and
             $\OO(\log^2 n)$ depth)
-      \item randomized $\nc^2$ for decision
+      \item randomized $\nc^2$ for $\dpm$
             with only $\OO(\log^2 n)$ random bits.
-      \item (We will not see this) $\nc^3$ for search
+      \item (We will not see this) $\mathsf{Quasi-}\nc^2$ for $\dpm$
+            (that is, with $\OO(n^{\log n})$ processors and
+            $\OO(\log^2 n)$ depth)
+      \item (We will not see this) $\nc^3$ for $\spm$
             with only $\OO(\log^2 n)$ random bits.
     \end{itemize}
   \end{resolved}
 \end{frame}
 
 \section{Combinatorics and Probability}
-
-\begin{frame}
-  \frametitle{Combinatorics and Probability}
-
-  \begin{remark}
-    Throughout this presentation, \emph{ALL} the graphs are:
-    \begin{itemize}
-      \item undirected
-      \item bipartite
-      \item balanced
-      \item labeled
-    \end{itemize}
-
-    Usually we call our graph $G$ and the set of edges $E$.
-
-    The set of edges can be regarded as a relation $E \subseteq [n] \times [n]$.
-  \end{remark}
-\end{frame}
 
 \begin{frame}
   % Definitions
@@ -180,7 +192,7 @@
   \end{exercise}
 
   \begin{exercise}
-    For which $B \in \mathbb{R}^{n \times n}$ and $E$ satisfy $B \le \biadj{E}$?
+    For which $B \in \ii^{n \times n}$ and $E$ does $B \le \biadj{E}$ hold?
   \end{exercise}
 \end{frame}
 
@@ -192,9 +204,9 @@
       \item We extend it naturally to a function $w : 2^E \to \nn$ by setting
             $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
 
-      \item Even more generally (why?), we extend it to a function $w : \ii^{n \times
-                n} \to \rr$ by setting
-            $w(A) = \sum_{i, j} w(A_{ij})$ for all $A \in \ii^{n \times n}$.
+      \item Even more generally (why?), we extend it to a
+            \emph{linear function} $w : \ii^{n \times n} \to \ii$ by setting
+            $w(A) = \sum_{ij \in E} w(ij) A_{ij}$ for all $A \in \ii^{n \times n}$.
     \end{itemize}
   \end{definitions}
 \end{frame}
@@ -270,7 +282,7 @@
   \end{corollary}
 \end{frame}
 
-\section{Complexity}
+\section{Isolation}
 \begin{frame}
   \begin{definition}
     Let $M$ be a perfect matching.
@@ -314,7 +326,7 @@
     Let $w : E \to \nn$ be defined by
     $w(e_k) = 2^k$. \emph{Every} subset of $E$ has a unique
     weight.
-    
+
     In particular, $w$ is isolating for $E$.
   \end{example}
 
@@ -372,8 +384,53 @@
   \end{corollary}
 \end{frame}
 
+\section{Cycles and Circulation}
+
 \begin{frame}
-  \frametitle{Cycles}
+  \frametitle{Circulation}
+
+  \begin{definition}
+    Let $w : E \to \nn$ be a weight function.
+    The \emph{$w$-circulation} of a cycle $C = {e_1, \ldots, e_{2k}}$ is defined as
+    \[
+      \cl_w(C) = |w(e_1) - w(e_2) + \ldots + w(e_{2k - 1}) - w(e_{2k})|
+    \]
+
+    This is well defined because we take the absolute value.
+  \end{definition}
+
+  \begin{remark}
+    Let $M_1$ and $M_2$ be two perfect matchings of $G$,
+    and suppose $C\subseteq M_1 \triangle M_2$.
+
+    Then $\cl_w(C) = |w(C \cap M_1) - w(C \cap M_2)|$.
+  \end{remark}
+\end{frame}
+
+
+% The theorem
+\begin{frame}
+  \begin{definition}
+    Suppose $G$ has a perfect matching. Let $w : E \to \nn$ be a weight function.
+
+    Then $G_w \subseteq G$ is the union of all minimum weight
+    perfect matchings of $G$, relatively to $w$.
+  \end{definition}
+
+  \begin{theorem}
+    Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
+
+    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
+    such that for every set of $w_i$ gives nonzero circulation to all the
+    cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
+
+    Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
+  \end{theorem}
+\end{frame}
+
+\section{The Proof}
+
+\begin{frame}
   \begin{claim}
     The symmetric difference of two perfect matchings is a union of
     disjoint cycles.
@@ -389,24 +446,6 @@
 
     Therefore it is a union of disjoint cycles. The rest is easy to see.
   \end{proof}
-\end{frame}
-\begin{frame}
-  \begin{definition}
-    Let $w : E \to \nn$ be a weight function.
-    The \emph{circulation} of a cycle $C = {e_1, \ldots, e_{2k}}$ is defined as
-    \[
-      \cl_w(C) = |w(e_1) - w(e_2) + \ldots + w(e_{2k - 1}) - w(e_{2k})|
-    \]
-
-    This is well defined because we take the absolute value.
-  \end{definition}
-
-  \begin{remark}
-    Let $M_1$ and $M_2$ be two perfect matchings of $G$,
-    and suppose $C\subseteq M_1 \triangle M_2$.
-
-    Then $\cl_w(C) = |w(C \cap M_1) - w(C \cap M_2)|$.
-  \end{remark}
 \end{frame}
 \begin{frame}
   \begin{lemma}
@@ -461,12 +500,6 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]
-  \begin{definition}
-    Suppose $G$ has a perfect matching. Let $w : E \to \nn$ be a weight function.
-
-    Then $G_w \subseteq G$ is the union of all minimum weight
-    perfect matchings of $G$, relatively to $w$.
-  \end{definition}
 
   \begin{lemma}
     Suppose $G$ has a perfect matching and let
@@ -477,7 +510,28 @@
   \end{lemma}
 
   \begin{proof}
-    TODO: complete me.
+    If $w$ is isolating, $G_w$ is just a single perfect matching.
+
+    Otherwise, suppose the minimum weight for perfect matchings in $G$
+    is $m$. Suppose there exist $t$ such matchings and let
+    $X$ be their average. Then, $w(X) = m$.
+
+    Let $N$ be a perfect matching in $G_w$.
+    Every edge is contained in some minimum weight perfect matching,
+    so $X - 1/t N \ge 0$.
+
+    It can easily be seen that the sum of every row and column
+    is $(t-1)/t$ and thus the matrix $\frac{t}{t-1} X - \frac{1}{t-1}N$ is
+    doubly stochastic.
+
+    Therefore, it lies in $\pmatch_G$ and thus has weight at least $m$.
+
+    That is, \[
+      m \le w\left(\frac{t}{t-1} X - \frac{1}{t-1}N\right) =
+      m \cdot \frac{t}{t-1} - w(N) \cdot \frac{1}{t-1}
+    \]
+
+    From that it follows that $w(N) \le m$.
   \end{proof}
 \end{frame}
 
@@ -491,7 +545,7 @@
 
   \begin{proof}
     Let $X$ be the average of all perfect matchings in $G_w$.
-    
+
     Let $t$ be the number of perfect matchings, $\varepsilon = 1/t$, and let
     $M_1, \ldots, M_t$ be the perfect matchings.
     Then $X = \varepsilon \sum_{i = 1}^t M_i$.
@@ -552,7 +606,7 @@
     Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
 
     Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
-    such that for every set of $w_i$ gives nonzero circulation to all the 
+    such that for every set of $w_i$ gives nonzero circulation to all the
     cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
 
     Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
@@ -573,17 +627,41 @@
     Suppose $M_1$ is a matching that appears in $G^i$ but not in $G^{i+1}$ and $M_2$ is a matching
     that appears in $G_{i+1}$.
 
-    Then $w_{i+1}(M_1) > w_{i+1}(M_2)$.
+    Then $w_i(M_2) < w_i(M_1)$.
   \end{lemma}
 
   \begin{proof}
-    Since $M_2$ appears in $G_{i+1}$, it has 
-    the same weight as the $w_i$-minimum weight matching in $G_i$.
-    That is $w_{i+1}(M_2) \le w_i(M_2)$.
+    Since $M_2$ appears in $G_{i+1}$, it has
+    the same weight as any $w_i$-minimum weight matching in $G_i$.
+    That is $w_{i}(M_2) \le w_i(M_1)$.
 
-    But if $w_{i+1}(M_1) = w_{i+1}(M_2)$, then $M_1$ would have been in $G^{i+1}$.
+    But if $w_{i+1}(M_1) = w_{i+1}(M_2)$ held, then $M_1$ would have been in $G^{i+1}$
     by its definition.
   \end{proof}
+
+\end{frame}
+
+% The algorithm
+\begin{frame}
+  \frametitle{Deciding $\dpm$}
+  The following algorithm solves $\dpm$ in $\mathsf{Quasi-}\nc^2$.
+
+  % Algorithm
+  \begin{algorithm}[H]
+    \caption{Decide $\dpm$}\label{alg:cap}
+    \begin{algorithmic}
+      \STATE Let $k = \log n - 2$.
+      \FORALL{possible choices of random values, simulataneously}
+      \STATE Create $w_0, \ldots, w_k$.
+      \STATE Combine $w = (w_0, \ldots, w_k)$.
+      \STATE Calculate $\det D_2^{G, w}$.
+      \IF{$\det D_2^{G, w} \ne 0$}
+      \RETURN{True}
+      \ENDIF
+      \ENDFOR
+      \RETURN{False}
+    \end{algorithmic}
+  \end{algorithm}
 \end{frame}
 
 \end{document}
