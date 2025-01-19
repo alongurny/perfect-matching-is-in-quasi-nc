@@ -148,7 +148,7 @@
 
   % CRT in NC1
   \begin{fact}
-    The Chinese Remainder Theorem can be solved in $\nc^1$.
+    The $\mathsf{CRT}$ problem can be solved in $\nc^1$.
     That is, given fixed $p_1, \ldots, p_n$ such that $p_1 \cdot \ldots \cdot p_n \le n^2$,
     the system of congruences $x \equiv a_i \mod{p_i}$ can be solved in $\nc^1$.
   \end{fact}
@@ -684,7 +684,7 @@
       \STATE Generate random numbers $r_0, \ldots, r_k$.
       \STATE Create $w_0, \ldots, w_k$.
       \STATE Combine $w = (w_0, \ldots, w_k)$.
-      \STATE Calculate $\det D_r^{G, w} \mod p_i$
+      \STATE Calculate $\det D_r^{G, w} \mod p_i$ for all $p_i$.
       \RETURN{$\forall i. \det D_r^{G, w} \not \equiv 0 \mod p_i$}
     \end{algorithmic}
   \end{algorithm}
@@ -703,8 +703,70 @@
     \caption{Decide $\dpm$ (deterministic)}
     \begin{algorithmic}
       \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$, simultaneously}
-      \STATE Calculate $\det D_r^{G, w}$.
+      \STATE Calculate $\det D_r^{G, w} \mod p_i$ for all $p_i$.
+      \STATE Using $\mathsf{CRT}$, calculate $\det D_r^{G, w}$.
       \IF{$\det D_r^{G, w} \ne 0$}
+      \RETURN{True}
+      \ENDIF
+      \ENDFOR
+      \RETURN{False}
+    \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Questions?}
+\end{frame}
+
+\begin{frame}
+  \begin{lemma}
+    Let $w_i : E \to \nn$ be $\mathsf{poly}(n)$-bounded weight functions.
+    There exists a weight function $w : E \to \nn$ which is $\mathsf{quasi-poly}(n)$-bounded,
+    such that $w$ and $(w_0, \ldots, w_k)$ are order-isomorphic
+    with regard to the lexicographic order. 
+  \end{lemma}
+
+  \begin{proof}
+    Take $w = w_0 B^k + w_1 B^{k-1} + \ldots + w_k$ where $B$ is a sufficiently large constant.
+  \end{proof}
+\end{frame}
+
+% The algorithm
+\begin{frame}
+  \frametitle{Deciding $\dpm$ in $\textsf{Quasi-}\nc^2$}
+  The following algorithm solves $\dpm$ in $\textsf{Quasi-}\nc^2$,
+  and even calculates $w(M)$.
+
+  Let $k = \log n - 2$.
+
+  % Algorithm
+  \begin{algorithm}[H]
+    \caption{Decide $\dpm$ (deterministic, alternative)}
+    \begin{algorithmic}
+      \FORALL {Possible weight functions $w$ simultaneously}
+      \STATE Calculate $\det D_2^{G, w} \mod p_i$ for all $p_i$.
+      \STATE Using $\mathsf{CRT}$, calculate $\det D_r^{G, w}$.
+      \IF{$\det D_r^{G, w} \ne 0$}
+      \RETURN{True, $w(M) = \nu_2(\det D_r^{G, w})$}
+      \ENDIF
+      \ENDFOR
+      \RETURN{False}
+    \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+\begin{frame}
+  \begin{exercise}
+    We can apply the last algorithm for $\spm$.
+  \end{exercise}
+
+  % Algorithm
+  \begin{algorithm}[H]
+    \caption{$\spm$ (deterministic, alternative)}
+    \begin{algorithmic}
+      \FORALL{ Possible weight functions $w$ and edge $e$ simultaneously}
+      \STATE Run the previous algorithm on both $G$ and $G - e$.
+      \IF{Both return True and w($G$) = w($G - e$)}
       \RETURN{True}
       \ENDIF
       \ENDFOR
