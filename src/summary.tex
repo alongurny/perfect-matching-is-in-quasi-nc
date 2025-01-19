@@ -78,6 +78,9 @@
 \frame{\titlepage}
 
 \begin{frame}
+  \begin{block}[Abstract]
+    This is a summary of "Bipartite Perfect Matching is in Quasi-NC" by Fenner, Gurjar, and Thierauf.
+  \end{block}
   \frametitle{Outline}
   \tableofcontents
 \end{frame}
@@ -91,8 +94,7 @@
   \frametitle{Notation}
 
   \begin{notation}
-    This is a summary of *"Bipartite Perfect Matching is in Quasi-NC"* by Fenner, Gurjar, and Thierauf.
-    
+
     Throughout this presentation, \emph{ALL} the graphs are:
     \begin{itemize}
       \item undirected
@@ -127,7 +129,7 @@
   \begin{fact}
     $\mathsf{DET}$,
     the problem of computing the determinant of an $n \times n$ matrix
-    with $\mathsf{poly}(n)$ entries,
+    with $\mathsf{poly}(n)$-bounded entries,
     is in $\nc^2$.
   \end{fact}
 \end{frame}
@@ -286,37 +288,31 @@
 \end{frame}
 
 \section{Isolation}
-\begin{frame}
+\begin{frame}[allowframebreaks]
   \begin{definition}
     Let $M$ be a perfect matching.
     We define its \emph{sign} $\sgn M = \sgn \sigma$ where $\sigma$
     is the permutation given by $M$.
   \end{definition}
   \begin{definition}
-    Let $w : E \to \nn$ be a weight function.
+    Let ${\left\{w_i : E \to \nn \right\}}_{i \in [k]}$ be weight functions.
 
-    Let $a$ be a number or a variable.
-
-    We define a matrix $D_a^{E,w}$ as follows:
+    We define the \emph{weighted Edmonds matrix} $D^{E,w}$ as follows:
 
     \[
-      {\left(D_a^{E,w}\right)}_{ij} =
+      {\left(D^{E,w}\right)}_{ij} =
       \begin{cases}
-        a^{w(ij)} & \text{if } (i, j) \in E, \\
-        0         & \text{otherwise}.
+        {x_{ij}^{(k)}}^{w_k(ij)} & \text{if } (i, j) \in E, \\
+        0            & \text{otherwise}.
       \end{cases}
     \]
-  \end{definition}
 
-  \begin{claim}
-    Let $a$ be a number or a variable. Then:
-    \[
-      \det D_a^{E,w} = \sum_{M \text{ perfect matching}} \sgn M \cdot a^{w(M)}
-    \]
-  \end{claim}
+    Let $a \in \nn^k$ be a vector of variables.
+    We also denote $D_a^{E,w} = D^{E,w}(x_{ij}^{(k)} := a_k)$
+  \end{definition}
 \end{frame}
 
-\begin{frame}
+\begin{frame}[allowframebreaks]
   \begin{definition}
     A weight function $w : E \to \nn$ is called \emph{isolating} for
     $E$ if the existence of a perfect matching in $E$
@@ -325,12 +321,11 @@
   \end{definition}
 
   \begin{corollary}
-    Let $x$ be a variable.
     \begin{itemize}
       \item If $E$ has no perfect matchings, then
-            $\det D_x^{E,w} = 0$.
+            $\det D^{E,w} = 0$.
       \item If $w$ is isolating for $E$,
-            then $\det D_x^{E,w} \ne 0 \iff $ there is a perfect matching.
+            then $\det D^{E,w} \ne 0 \iff $ there is a perfect matching.
     \end{itemize}
   \end{corollary}
 
@@ -449,7 +444,7 @@
   \end{proof}
 \end{frame}
 
-\section{The Proof}
+\section{The Theorem}
 
 % The theorem
 \begin{frame}
@@ -580,7 +575,7 @@
   \begin{lemma}
     Using $\OO(\log n)$ random bits we can
     generate a weight assignment
-    $w : E \to \nn$ with $w(n) \le \mathsf{poly}(n)$ such that for every set
+    $w : E \to \nn$ with $w \le \mathsf{poly}(n)$ such that for every set
     of $n^4$ cycles,
     $w$ gives nonzero circulation to all of them with probability at
     least $1 - 1/n$.
@@ -645,23 +640,44 @@
 
 % The algorithm
 \begin{frame}
-  \frametitle{Deciding $\dpm$}
-  The following algorithm solves $\dpm$ in $\mathsf{Quasi-}\nc^2$.
+  \frametitle{Deciding $\dpm$ in randomized $\nc^2$}
+  The following algorithm solves $\dpm$ in randomized $\nc^2$
+  with $\OO(\log^2 n)$ random bits.
 
   % Algorithm
   \begin{algorithm}[H]
-    \caption{Decide $\dpm$}\label{alg:cap}
+    \caption{Decide $\dpm$ (randomized)}
     \begin{algorithmic}
       \STATE Let $k = \log n - 2$.
-      \FORALL{possible choices of random values, simulataneously}
+      \STATE Generate random weight functions $w_0, \ldots, w_k$.
+      \STATE Generate random numbers $r_0, \ldots, r_k$.
       \STATE Create $w_0, \ldots, w_k$.
       \STATE Combine $w = (w_0, \ldots, w_k)$.
+      \STATE Calculate $\det D_r^{G, w}$.
+      \RETURN{$\det D_r^{G, w} \ne 0$}
+    \end{algorithmic}
+  \end{algorithm}
+\end{frame}
+
+
+% The algorithm
+\begin{frame}
+  \frametitle{Deciding $\dpm$ in randomized $Quasi-\nc^2$}
+  The following algorithm solves $\dpm$ in $\nc^2$
+  with $\OO(\log^2 n)$ random bits.
+
+  % Algorithm
+  \begin{algorithm}[H]
+    \caption{Decide $\dpm$ (deterministic)}
+    \begin{algorithmic}
+      \STATE Let $k = \log n - 2$.
+      \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$}
       \STATE Calculate $\det D_2^{G, w}$.
       \IF{$\det D_2^{G, w} \ne 0$}
       \RETURN{True}
       \ENDIF
-      \ENDFOR
       \RETURN{False}
+      \ENDFOR
     \end{algorithmic}
   \end{algorithm}
 \end{frame}
