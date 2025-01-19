@@ -608,6 +608,22 @@
 
 % The algorithm
 \begin{frame}[allowframebreaks]
+  \begin{lemma}
+    Suppose $M_1$ is a matching that appears in $G^i$ but not in $G^{i+1}$ and $M_2$ is a matching
+    that appears in $G_{i+1}$.
+
+    Then $w_i(M_2) < w_i(M_1)$.
+  \end{lemma}
+
+  \begin{proof}
+    Since $M_2$ appears in $G_{i+1}$, it has
+    the same weight as any $w_i$-minimum weight matching in $G_i$.
+    That is $w_{i}(M_2) \le w_i(M_1)$.
+
+    But if $w_i(M_1) = w_i(M_2)$ held, then $M_1$ would have been in $G^{i+1}$
+    by its definition.
+  \end{proof}
+
   \begin{theorem}
     Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions.
 
@@ -625,25 +641,8 @@
 
     In particular, $G^k$ has no cycles of size at most $4 \cdot 2^k \ge n$.
 
-    That is, $G^k$ has a unique perfect matching.
-    We want to show that it is isolated by $w$.
-    This follows from the next lemma.
-  \end{proof}
-
-  \begin{lemma}
-    Suppose $M_1$ is a matching that appears in $G^i$ but not in $G^{i+1}$ and $M_2$ is a matching
-    that appears in $G_{i+1}$.
-
-    Then $w_i(M_2) < w_i(M_1)$.
-  \end{lemma}
-
-  \begin{proof}
-    Since $M_2$ appears in $G_{i+1}$, it has
-    the same weight as any $w_i$-minimum weight matching in $G_i$.
-    That is $w_{i}(M_2) \le w_i(M_1)$.
-
-    But if $w_i(M_1) = w_i(M_2)$ held, then $M_1$ would have been in $G^{i+1}$
-    by its definition.
+    That is, $G^k$ has a unique perfect matching,
+    and it is isolated in $G$ by the previous lemma.
   \end{proof}
 
 \end{frame}
