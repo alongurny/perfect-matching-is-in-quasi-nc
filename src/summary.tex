@@ -672,8 +672,8 @@
     \begin{algorithmic}
       \STATE Let $k = \log n - 2$.
       \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$}
-      \STATE Calculate $\det D_2^{G, w}$.
-      \IF{$\det D_2^{G, w} \ne 0$}
+      \STATE Calculate $\det D_r^{G, w}$.
+      \IF{$\det D_r^{G, w} \ne 0$}
       \RETURN{True}
       \ENDIF
       \RETURN{False}
