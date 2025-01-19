@@ -183,6 +183,9 @@
       \item The \emph{bi-adjacency matrix}: $\biadj{G} = \biadj{E} = A$ of $G$ (or $E$) is an $n \times n$ matrix where
             $A_{ij} = 1_{(i, j) \in E}$
       \item We write $B \le C$ iff $\forall i, j. B_{ij} \le C_{ij}$
+      \item A \emph{permutation matrix} is a matrix $\biadj{\Gamma}$
+            where $\Gamma = \setcomp{(i, \sigma i) : i \in [n]}$ for some permutation
+            $\sigma \in S_n$
 
     \end{itemize}
   \end{definitions}
@@ -205,8 +208,8 @@
             $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
 
       \item Even more generally (why?), we extend it to a
-            \emph{linear function} $w : \ii^{n \times n} \to \ii$ by setting
-            $w(A) = \sum_{ij \in E} w(ij) A_{ij}$ for all $A \in \ii^{n \times n}$.
+            \emph{linear function} $w : \rr^{n \times n} \to \ii$ by setting
+            $w(A) = \sum_{ij \in E} w(ij) A_{ij}$ for all $A \in \rr^{n \times n}$.
     \end{itemize}
   \end{definitions}
 \end{frame}
@@ -214,9 +217,6 @@
 \begin{frame}
   \begin{definitions}[Perfect Matching]
     \begin{itemize}
-      \item A \emph{permutation matrix} is a matrix $\biadj{\Gamma}$
-            where $\Gamma = \setcomp{(i, \sigma i) : i \in [n]}$ for some permutation
-            $\sigma \in S_n$
       \item A \emph{perfect matching} is a set of edges $M$ such
             that every vertex is incident to exactly one edge in $M$.
       \item Equivalently, $M$ is a perfect matching iff $\biadj{M}$ is a permutation
@@ -261,7 +261,6 @@
 
 \begin{frame}
   \frametitle{Perfect Matching Polytope}
-
   \begin{theorem}[Birkhoff, 1946]
     The set of doubly stochastic matrices is the convex hull of the
     permutation matrices.
@@ -321,15 +320,6 @@
     which is then called \emph{isolated}.
   \end{definition}
 
-  \begin{example}
-    Let $E = \left\{e_k\right\}_k$ be an enumeration of the edges.
-    Let $w : E \to \nn$ be defined by
-    $w(e_k) = 2^k$. \emph{Every} subset of $E$ has a unique
-    weight.
-
-    In particular, $w$ is isolating for $E$.
-  \end{example}
-
   \begin{corollary}
     Let $x$ be a variable.
     \begin{itemize}
@@ -339,6 +329,15 @@
             then $\det D_x^{E,w} \ne 0 \iff $ there is a perfect matching.
     \end{itemize}
   \end{corollary}
+
+  \begin{example}
+    Let $E = \left\{e_k\right\}_k$ be an enumeration of the edges.
+    Let $w : E \to \nn$ be defined by
+    $w(e_k) = 2^k$. \emph{Every} subset of $E$ has a unique
+    weight.
+
+    In particular, $w$ is isolating for $E$.
+  \end{example}
 \end{frame}
 
 \begin{frame}
@@ -388,7 +387,6 @@
 
 \begin{frame}
   \frametitle{Circulation}
-
   \begin{definition}
     Let $w : E \to \nn$ be a weight function.
     The \emph{$w$-circulation} of a cycle $C = {e_1, \ldots, e_{2k}}$ is defined as
@@ -406,29 +404,6 @@
     Then $\cl_w(C) = |w(C \cap M_1) - w(C \cap M_2)|$.
   \end{remark}
 \end{frame}
-
-
-% The theorem
-\begin{frame}
-  \begin{definition}
-    Suppose $G$ has a perfect matching. Let $w : E \to \nn$ be a weight function.
-
-    Then $G_w \subseteq G$ is the union of all minimum weight
-    perfect matchings of $G$, relatively to $w$.
-  \end{definition}
-
-  \begin{theorem}
-    Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
-
-    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
-    such that for every set of $w_i$ gives nonzero circulation to all the
-    cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
-
-    Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
-  \end{theorem}
-\end{frame}
-
-\section{The Proof}
 
 \begin{frame}
   \begin{claim}
@@ -467,6 +442,29 @@
     contradicting minimality.
   \end{proof}
 \end{frame}
+
+\section{The Proof}
+
+% The theorem
+\begin{frame}
+  \begin{definition}
+    Suppose $G$ has a perfect matching. Let $w : E \to \nn$ be a weight function.
+
+    Then $G_w \subseteq G$ is the union of all minimum weight
+    perfect matchings of $G$, relatively to $w$.
+  \end{definition}
+
+  \begin{theorem}
+    Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
+
+    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
+    such that $w_i$ gives nonzero circulation to all the
+    cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
+
+    Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
+  \end{theorem}
+\end{frame}
+
 \begin{frame}[allowframebreaks]
   \begin{lemma}
     Let $r \ge 2$ be even.
@@ -500,7 +498,6 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]
-
   \begin{lemma}
     Suppose $G$ has a perfect matching and let
     $w : E \to \nn$ be a weight function.
