@@ -123,7 +123,7 @@
   \begin{fact}
     $\mathsf{DET}$,
     the problem of computing the determinant of an $n \times n$ matrix
-    with $poly(n)$ entries,
+    with $\mathsf{poly}(n)$ entries,
     is in $\nc^2$.
   \end{fact}
 \end{frame}
@@ -208,7 +208,7 @@
             $w(S) = \sum_{e \in S} w(e)$ for all $S \subseteq E$.
 
       \item Even more generally (why?), we extend it to a
-            \emph{linear function} $w : \rr^{n \times n} \to \ii$ by setting
+            \emph{linear function} $w : \rr^{n \times n} \to \rr$ by setting
             $w(A) = \sum_{ij \in E} w(ij) A_{ij}$ for all $A \in \rr^{n \times n}$.
     \end{itemize}
   \end{definitions}
@@ -337,6 +337,8 @@
     weight.
 
     In particular, $w$ is isolating for $E$.
+
+    Is this enough?
   \end{example}
 \end{frame}
 
@@ -379,7 +381,7 @@
 
   \begin{corollary}
     There exists an $\mathsf{RNC}$ algorithm that can solve $\dpm$,
-    which uses $poly(n)$ random bits.
+    which uses $\mathsf{poly}(n)$ random bits.
   \end{corollary}
 \end{frame}
 
@@ -572,28 +574,27 @@
 \end{frame}
 \begin{frame}
   \begin{lemma}
-    Let $s = \text{poly}(n)$. Using $\OO(\log n)$ random bits we can
+    Using $\OO(\log n)$ random bits we can
     generate a weight assignment
-    $w : E \to \nn$ with $|w| = \text{poly}(n)$ such that for every set
-    of $s$ cycles,
+    $w : E \to \nn$ with $w(n) \le \mathsf{poly}(n)$ such that for every set
+    of $n^4$ cycles,
     $w$ gives nonzero circulation to all of them with probability at
     least $1 - 1/n$.
   \end{lemma}
 
   \begin{proof}
+    Let $w(e_k) = 2^k$.
     Let the cycles be $C_1, \ldots, C_s$. Then, $\cl_w(C_i) \ne 0$ for
     all $i$ is equivalent to
-    $\prod_{i = 1}^s \cl_w(C_i) \ne 0$. This product is bounded by
-    $\text{poly}(n)^s = 2^{\text{poly}(n)}$.
+    $\prod_{i = 1}^{n^4} \cl_w(C_i) \ne 0$. This product is bounded by
+    $\mathsf{poly}(n)^{n^4} = 2^{\mathsf{poly}(n)}$.
 
-    Thus, it has at most $\text{poly}(n)$ prime factors, say $k$ prime
+    Thus, it has at most $\mathsf{poly}(n)$ prime factors, say $k$ prime
     factors. Choose $t = kn$.
 
     Then if we choose a random prime amongst the first $t$ primes
     $[p_1, \ldots, p_t]$, then if the product is nonzero,
     with probability at least $1 - 1/n$ it is still true modulo the chosen prime.
-
-    Choose $w(e_k) = 2^k$ and we are done.
   \end{proof}
 \end{frame}
 
