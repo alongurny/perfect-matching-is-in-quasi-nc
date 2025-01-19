@@ -313,12 +313,19 @@
 \end{frame}
 
 \begin{frame}[allowframebreaks]
-  \begin{definition}
-    A weight function $w : E \to \nn$ is called \emph{isolating} for
-    $E$ if the existence of a perfect matching in $E$
-    implies that $E$ has a unique minimum weight perfect matching,
-    which is then called \emph{isolated}.
-  \end{definition}
+  \begin{definitions}
+    \begin{itemize}
+      \item A weight function $w : E \to \nn$ is called \emph{isolating} for
+      $E$ if the existence of a perfect matching in $E$
+      implies that $E$ has a unique minimum weight perfect matching,
+      which is then called \emph{isolated}.
+
+      \item Similarly, a sequence of weight functions $w = {w_i}_{i \in [k]}$
+      is called isolating for $E$ if the existence of a perfect matching
+      in $E$ implies that $E$ has a unique minimum weight perfect matching
+      with respect to $w = (w_0, \ldots, w_k)$, ordered lexicographically.
+    \end{itemize}
+  \end{definitions}
 
   \begin{corollary}
     \begin{itemize}
@@ -328,7 +335,9 @@
             then $\det D^{E,w} \ne 0 \iff $ there is a perfect matching.
     \end{itemize}
   \end{corollary}
+\end{frame}
 
+\begin{frame}
   \begin{example}
     Let $E = \left\{e_k\right\}_k$ be an enumeration of the edges.
     Let $w : E \to \nn$ be defined by
@@ -662,7 +671,7 @@
 
 % The algorithm
 \begin{frame}
-  \frametitle{Deciding $\dpm$ in randomized $Quasi-\nc^2$}
+  \frametitle{Deciding $\dpm$ in randomized $\textsf{Quasi-}\nc^2$}
   The following algorithm solves $\dpm$ in $\nc^2$
   with $\OO(\log^2 n)$ random bits.
 
