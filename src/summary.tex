@@ -609,10 +609,11 @@
 % The algorithm
 \begin{frame}[allowframebreaks]
   \begin{theorem}
+    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions.
+
     Let $G^0 = G$ be and $G^{i+1} = {\left(G^{i}\right)}_{w_i}$.
 
-    Let $k \ge \log n - 2$ and let $w_0, \ldots, w_k : E \to \nn$ be weight functions
-    such that for every set of $w_i$ gives nonzero circulation to all the
+    Suppose that for every set of $w_i$ gives nonzero circulation to all the
     cycles of size at most $4 \cdot 2^i$ in $G_{i}$.
 
     Then the joint weight function $w = (w_0, \ldots, w_k)$ is isolating.
