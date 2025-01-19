@@ -125,12 +125,32 @@
             \]
     \end{itemize}
   \end{definition}
+\end{frame}
 
+% Known problems
+\begin{frame}
   \begin{fact}
     $\mathsf{DET}$,
     the problem of computing the determinant of an $n \times n$ matrix
     with $\mathsf{poly}(n)$-bounded entries,
     is in $\nc^2$.
+  \end{fact}
+
+  % CRT
+  \begin{theorem}[Chinese Remainder Theorem]
+    Let $m_1, \ldots, m_k$ be pairwise coprime integers.
+    
+    Let $a_1, \ldots, a_k$ be integers.
+
+    Then the system of congruences $x \equiv a_i \mod{m_i}$ has a unique solution
+    modulo $m_1 \cdot \ldots \cdot m_k$.
+  \end{theorem}
+
+  % CRT in NC1
+  \begin{fact}
+    The Chinese Remainder Theorem can be solved in $\nc^1$.
+    That is, given fixed $p_1, \ldots, p_n$ such that $p_1 \cdot \ldots \cdot p_n \le n^2$,
+    the system of congruences $x \equiv a_i \mod{p_i}$ can be solved in $\nc^1$.
   \end{fact}
 \end{frame}
 
@@ -653,17 +673,19 @@
   The following algorithm solves $\dpm$ in randomized $\nc^2$
   with $\OO(\log^2 n)$ random bits.
 
+  We fix some $\OO(n^2)$ primes $p_i$.
+  Let $k = \log n - 2$.
+
   % Algorithm
   \begin{algorithm}[H]
     \caption{Decide $\dpm$ (randomized)}
     \begin{algorithmic}
-      \STATE Let $k = \log n - 2$.
       \STATE Generate random weight functions $w_0, \ldots, w_k$.
       \STATE Generate random numbers $r_0, \ldots, r_k$.
       \STATE Create $w_0, \ldots, w_k$.
       \STATE Combine $w = (w_0, \ldots, w_k)$.
-      \STATE Calculate $\det D_r^{G, w}$.
-      \RETURN{$\det D_r^{G, w} \ne 0$}
+      \STATE Calculate $\det D_r^{G, w} \mod p_i$
+      \RETURN{$\forall i. \det D_r^{G, w} \not \equiv 0 \mod p_i$}
     \end{algorithmic}
   \end{algorithm}
 \end{frame}
@@ -671,14 +693,15 @@
 
 % The algorithm
 \begin{frame}
-  \frametitle{Deciding $\dpm$ in randomized $\textsf{Quasi-}\nc^2$}
+  \frametitle{Deciding $\dpm$ in $\textsf{Quasi-}\nc^2$}
   The following algorithm solves $\dpm$ in $\textsf{Quasi-}\nc^2$.
+
+  Let $k = \log n - 2$.
 
   % Algorithm
   \begin{algorithm}[H]
     \caption{Decide $\dpm$ (deterministic)}
     \begin{algorithmic}
-      \STATE Let $k = \log n - 2$.
       \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$, simultaneously}
       \STATE Calculate $\det D_r^{G, w}$.
       \IF{$\det D_r^{G, w} \ne 0$}
