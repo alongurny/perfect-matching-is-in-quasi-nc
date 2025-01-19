@@ -671,7 +671,7 @@
     \caption{Decide $\dpm$ (deterministic)}
     \begin{algorithmic}
       \STATE Let $k = \log n - 2$.
-      \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$}
+      \FORALL {Possible weight functions $w_0, \ldots, w_k$ and $r$, simultaneously}
       \STATE Calculate $\det D_r^{G, w}$.
       \IF{$\det D_r^{G, w} \ne 0$}
       \RETURN{True}
